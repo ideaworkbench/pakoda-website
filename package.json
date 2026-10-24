@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@react-stately/utils": "^3.12.1",
     "@react-types/shared": "^3.37.0",
     "@tailwindcss/typography": "^0.5.20",
     "@untitledui/icons": "^0.0.22",
