@@ -113,7 +113,12 @@ function writeReport() {
     const screenshotPath = path.join(screenshotDirectory, `${screen.name}.png`);
     if (!existsSync(screenshotPath)) return `| ${screen.name} | ${screen.figmaNode} | missing | missing | — | not captured |`;
 
-    const result = compareWithFigma(screen, readFileSync(screenshotPath));
+    let result: ComparisonResult;
+    try {
+      result = compareWithFigma(screen, readFileSync(screenshotPath));
+    } catch (error) {
+      return `| ${screen.name} | ${screen.figmaNode} | — | — | — | **${(error as Error).message}** |`;
+    }
     writeFileSync(path.join(diffDirectory, `${screen.name}.png`), result.diffImage);
     const verdict = result.filteredMismatchPercent <= MAXIMUM_FILTERED_MISMATCH_PERCENT ? "pass" : "**defect**";
     const masks = screen.masks.map((mask) => `${mask.width}×${mask.height} at (${mask.x}, ${mask.y})`).join(", ") || "none";

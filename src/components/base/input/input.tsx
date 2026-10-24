@@ -1,9 +1,10 @@
 "use client";
 
 import { type ComponentType, type HTMLAttributes, type ReactNode, type Ref, createContext, useContext } from "react";
-import { HelpCircle, InfoCircle } from "@untitledui/icons";
+import { HelpCircle } from "@untitledui/icons";
 import type { InputProps as AriaInputProps, TextFieldProps as AriaTextFieldProps } from "react-aria-components";
 import { Group as AriaGroup, Input as AriaInput, TextField as AriaTextField } from "react-aria-components";
+import { AlertCircle } from "@/assets/icons/alert-circle";
 import { HintText } from "@/components/base/input/hint-text";
 import { Label } from "@/components/base/input/label";
 import { Tooltip, TooltipTrigger } from "@/components/base/tooltip/tooltip";
@@ -147,11 +148,12 @@ export const InputBase = ({
                 </Tooltip>
             )}
 
-            {/* Invalid icon */}
+            {/* Invalid icon: the Pakoda Figma file uses alert-circle where Untitled UI uses info-circle. */}
             {isInvalid && (
-                <InfoCircle
+                <AlertCircle
+                    data-testid="field-alert-icon"
                     className={cx(
-                        "pointer-events-none absolute size-4 text-fg-error-secondary",
+                        "pointer-events-none absolute size-4",
                         sizes[inputSize].iconTrailing,
                         context?.tooltipClassName,
                         tooltipClassName,

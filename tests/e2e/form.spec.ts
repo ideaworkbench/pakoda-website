@@ -6,6 +6,7 @@ import {
   fieldNames,
   fillRequiredFields,
   openFromHeader,
+  setConsent,
   selectTrigger,
   submitButton,
   textField,
@@ -30,7 +31,7 @@ test("6. the submit button stays disabled until every required condition holds",
   await expect(submitButton(page)).toBeDisabled();
   await textField(page, fieldNames.email).fill("hello@pakoda.com");
   await expect(submitButton(page)).toBeDisabled();
-  await consentCheckbox(page).check();
+  await setConsent(page, true);
   await expect(submitButton(page)).toBeEnabled();
 });
 
@@ -38,9 +39,9 @@ test("6. the submit button is disabled again when any condition is undone", asyn
   await fillRequiredFields(page, "hello@pakoda.com");
   await expect(submitButton(page)).toBeEnabled();
 
-  await consentCheckbox(page).uncheck();
+  await setConsent(page, false);
   await expect(submitButton(page)).toBeDisabled();
-  await consentCheckbox(page).check();
+  await setConsent(page, true);
 
   await textField(page, fieldNames.fullName).fill("");
   await expect(submitButton(page)).toBeDisabled();
@@ -80,7 +81,8 @@ test("8. leaving the email empty shows the error style from Figma", async ({ pag
   await email.blur();
 
   await expect(dialog(page).getByText("Email address is mandatory.")).toHaveCSS("color", "rgb(217, 45, 32)");
-  await expect(email.locator("..")).toHaveCSS("border-color", "rgb(253, 162, 155)");
+  // Figma's 1px border is drawn inside the field, so the build uses an inset ring (box-shadow).
+  await expect(email.locator("..")).toHaveCSS("box-shadow", /rgb\(253, 162, 155\)/);
   await expect(dialog(page).getByTestId("field-alert-icon")).toBeVisible();
 });
 
@@ -98,7 +100,7 @@ test("10. the business type error has a red border and message, the chevron and 
   await trigger.blur();
 
   await expect(dialog(page).getByText("Business type is mandatory.")).toBeVisible();
-  await expect(trigger).toHaveCSS("border-color", "rgb(253, 162, 155)");
+  await expect(trigger).toHaveCSS("box-shadow", /rgb\(253, 162, 155\)/);
   await expect(trigger.getByTestId("select-chevron")).toBeVisible();
   await expect(trigger.getByTestId("field-alert-icon")).toHaveCount(0);
 });

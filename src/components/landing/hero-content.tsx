@@ -1,4 +1,4 @@
-import { Button } from "@/components/base/buttons/button";
+import { EarlyAccessTrigger } from "@/components/early-access/early-access-provider";
 
 export const HeroContent = () => {
     return (
@@ -14,9 +14,9 @@ export const HeroContent = () => {
                         and restaurants.
                     </p>
                     {/* Figma draws the primary button flat: medium weight, no shadow, ring or inner border. */}
-                    <Button color="primary" size="sm" className="font-medium shadow-none ring-0 before:hidden">
+                    <EarlyAccessTrigger color="primary" size="sm" className="font-medium shadow-none ring-0 before:hidden">
                         Get early access
-                    </Button>
+                    </EarlyAccessTrigger>
                 </div>
             </div>
         </section>

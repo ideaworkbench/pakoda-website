@@ -52,8 +52,11 @@ test("4. closing mid-entry and reopening keeps the entered values", async ({ pag
   await openFromHeader(page);
   await textField(page, fieldNames.fullName).fill("Asha Rao");
   await textField(page, fieldNames.email).fill("asha@");
+  // Leave the field first: its error grows the centred card, which moves x-close mid-click.
+  await textField(page, fieldNames.email).blur();
 
   await closeButton(page).click();
+  await expect(dialog(page)).toBeHidden();
   await page.getByRole("button", { name: "Get early access" }).click();
 
   await expect(textField(page, fieldNames.fullName)).toHaveValue("Asha Rao");

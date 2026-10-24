@@ -17,9 +17,9 @@ export function textField(page: Page, name: string) {
   return dialog(page).getByRole("textbox", { name, exact: true });
 }
 
-// Select triggers are buttons whose accessible name starts with the field's hidden label.
+// A select trigger's accessible name is its current value followed by the field's hidden label.
 export function selectTrigger(page: Page, name: string) {
-  return dialog(page).getByRole("button", { name: new RegExp(`^${escapeForRegExp(name)}`) });
+  return dialog(page).getByRole("button", { name: new RegExp(`${escapeForRegExp(name)}$`) });
 }
 
 export function consentCheckbox(page: Page) {
@@ -32,6 +32,14 @@ export function submitButton(page: Page) {
 
 export function closeButton(page: Page) {
   return dialog(page).getByRole("button", { name: "Close" });
+}
+
+// The checkbox input is visually hidden, as in React Aria, so tests click its label like a person would.
+export async function setConsent(page: Page, shouldBeChecked: boolean) {
+  if ((await consentCheckbox(page).isChecked()) !== shouldBeChecked) {
+    await dialog(page).getByText("I agree to be contacted about Pakoda").click();
+  }
+  await expect(consentCheckbox(page)).toBeChecked({ checked: shouldBeChecked });
 }
 
 export async function openFromHeader(page: Page) {
@@ -49,7 +57,7 @@ export async function fillRequiredFields(page: Page, email: string) {
   await textField(page, fieldNames.businessName).fill("Rao Stores");
   await chooseOption(page, fieldNames.businessType, "Grocery");
   await textField(page, fieldNames.email).fill(email);
-  await consentCheckbox(page).check();
+  await setConsent(page, true);
 }
 
 // Server actions are POSTs to the page carrying a Next-Action header. Holding them

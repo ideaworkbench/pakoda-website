@@ -2,6 +2,7 @@
 
 import type { ReactNode, Ref } from "react";
 import { Checkbox as AriaCheckbox, type CheckboxProps as AriaCheckboxProps } from "react-aria-components";
+import { CheckboxCheck } from "@/assets/icons/checkbox-check";
 import { cx } from "@/utils/cx";
 
 export interface CheckboxBaseProps {
@@ -39,19 +40,14 @@ export const CheckboxBase = ({ className, isSelected, isDisabled, isIndeterminat
                 <path d="M2.91675 7H11.0834" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
 
-            <svg
-                aria-hidden="true"
-                viewBox="0 0 14 14"
-                fill="none"
+            {/* The Pakoda Figma file draws its own 12px check, inset 2px in the 16px box. */}
+            <CheckboxCheck
                 className={cx(
-                    "pointer-events-none absolute size-3 text-fg-white opacity-0 transition-inherit-all",
+                    "pointer-events-none absolute size-3 opacity-0 transition-inherit-all",
                     size === "md" && "size-3.5",
                     isSelected && !isIndeterminate && "opacity-100",
-                    isDisabled && "text-fg-disabled_subtle",
                 )}
-            >
-                <path d="M11.6666 3.5L5.24992 9.91667L2.33325 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            />
         </div>
     );
 };

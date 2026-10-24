@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button } from "@/components/base/buttons/button";
+import { EarlyAccessTrigger } from "@/components/early-access/early-access-provider";
 
 // Logo parts sit at Figma's exact offsets inside the 139 × 32 "Logo wrap"; the mark overhangs it by 2px.
 const SiteLogo = () => (
@@ -18,9 +18,9 @@ export const SiteHeader = () => {
         <header className="flex h-[103px] items-center justify-between p-8">
             <SiteLogo />
             {/* Figma uses medium weight; Untitled UI buttons default to semibold. */}
-            <Button color="secondary" size="sm" className="font-medium">
+            <EarlyAccessTrigger color="secondary" size="sm" className="font-medium">
                 Join the list
-            </Button>
+            </EarlyAccessTrigger>
         </header>
     );
 };

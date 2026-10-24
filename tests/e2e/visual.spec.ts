@@ -27,9 +27,23 @@ const orderChannelsExportHeight = 617;
 
 type Capture = (page: Page) => Promise<Buffer>;
 
+// The modal zooms in on open. Wait for finite animations to end (the sending spinner never does)
+// so the card is measured and captured at its final size.
+async function waitForAnimationsToFinish(page: Page) {
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) => animation.effect?.getTiming().iterations !== Infinity)
+        .map((animation) => animation.finished),
+    ),
+  );
+}
+
 async function cardScreenshot(page: Page, height?: number) {
   // Leave hover styles out of the capture; Figma draws no hovered element.
   await page.mouse.move(0, 0);
+  await waitForAnimationsToFinish(page);
   const card = await page.getByTestId("early-access-card").boundingBox();
   if (!card) throw new Error("The early-access card is not on screen");
   return page.screenshot({ clip: { x: card.x, y: card.y, width: card.width, height: height ?? card.height }, animations: "disabled" });
@@ -37,7 +51,14 @@ async function cardScreenshot(page: Page, height?: number) {
 
 async function viewportScreenshot(page: Page) {
   await page.mouse.move(0, 0);
+  await waitForAnimationsToFinish(page);
   return page.screenshot({ animations: "disabled" });
+}
+
+// Inside the modal, element.blur() is undone by the focus trap. Clicking the card's empty header
+// area moves focus to the dialog, as it would for a person.
+async function leaveField(page: Page) {
+  await page.getByTestId("early-access-card").click({ position: { x: 200, y: 47 } });
 }
 
 async function submitAs(page: Page, email: string) {
@@ -69,7 +90,7 @@ const captures: Record<string, { viewport: { width: number; height: number }; ca
       await openFromHeader(page);
       await textField(page, fieldNames.mobileNumber).click();
       await page.keyboard.type("9876543210");
-      await textField(page, fieldNames.mobileNumber).blur();
+      await leaveField(page);
       return cardScreenshot(page);
     },
   },
@@ -96,7 +117,7 @@ const captures: Record<string, { viewport: { width: number; height: number }; ca
     capture: async (page) => {
       await openFromHeader(page);
       await textField(page, fieldNames.email).focus();
-      await textField(page, fieldNames.email).blur();
+      await leaveField(page);
       return cardScreenshot(page);
     },
   },

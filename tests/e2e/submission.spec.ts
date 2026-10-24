@@ -36,7 +36,8 @@ test("14. while sending, the form is locked and cannot be submitted twice", asyn
   const sendingButton = dialog(page).getByRole("button", { name: "Sending..." });
   await expect(sendingButton).toBeDisabled();
   await expect(textField(page, fieldNames.fullName)).toHaveAttribute("readonly", "");
-  await expect(consentCheckbox(page)).toBeDisabled();
+  // Locked but drawn as normal (brief 8.8), so read-only rather than disabled.
+  await expect(consentCheckbox(page)).toHaveAttribute("aria-readonly", "true");
   await expect(closeButton(page)).toBeDisabled();
   await sendingButton.click({ force: true });
 
