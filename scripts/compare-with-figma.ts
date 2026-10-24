@@ -31,7 +31,9 @@ export interface ComparisonResult {
 
 export const MAXIMUM_FILTERED_MISMATCH_PERCENT = 0.5;
 
-const visualDirectory = path.resolve(import.meta.dirname, "../tests/visual");
+// Paths are relative to the repository root, where npm scripts and Playwright both run.
+// (`import.meta` is unavailable because Playwright loads this file as CommonJS.)
+const visualDirectory = path.resolve("tests/visual");
 export const figmaDirectory = path.join(visualDirectory, "figma");
 export const screenshotDirectory = path.join(visualDirectory, "screenshots");
 const diffDirectory = path.join(visualDirectory, "diffs");
@@ -133,6 +135,7 @@ function writeReport() {
   console.log(report);
 }
 
-if (import.meta.main) {
+const isRunDirectly = process.argv[1]?.endsWith("compare-with-figma.ts");
+if (isRunDirectly) {
   writeReport();
 }
