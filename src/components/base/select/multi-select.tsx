@@ -132,7 +132,7 @@ export const MultiSelectBase = ({
     // Resize observer for popover width
     const onResize = useCallback(() => {
         if (!placeholderRef.current) return;
-        let divRect = placeholderRef.current?.getBoundingClientRect();
+        const divRect = placeholderRef.current?.getBoundingClientRect();
         setPopoverWidth(divRect.width + "px");
     }, [placeholderRef, setPopoverWidth]);
 
@@ -220,7 +220,7 @@ const InnerMultiSelect = ({ isDisabled, shortcut, shortcutClassName, placeholder
     };
 
     // Ensure dropdown opens on click even if input is already focused
-    const handleInputMouseDown = (_event: React.MouseEvent<HTMLInputElement>) => {
+    const handleInputMouseDown = () => {
         if (comboBoxStateContext && !comboBoxStateContext.isOpen) {
             comboBoxStateContext.open();
         }
