@@ -1,0 +1,12 @@
+{
+  "//": "Type-checks tests, scripts and tool configs, which the Next.js build leaves out.",
+  "extends": "./tsconfig.json",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
