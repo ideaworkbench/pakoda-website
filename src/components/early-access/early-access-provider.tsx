@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/base/buttons/button";
 import { type Registration, type RegistrationFormValues, emptyRegistrationForm, registrationSchema } from "@/lib/early-access/schema";
+import type { SubmissionResult } from "@/lib/early-access/submission-result";
+import { submitRegistration } from "@/lib/early-access/submit-registration";
 import { type CompletedRegistration, EarlyAccessDialog } from "./early-access-dialog";
 
 interface EarlyAccessContextValue {
@@ -35,8 +37,32 @@ export const EarlyAccessProvider = ({ children }: { children: ReactNode }) => {
         mode: "onTouched",
     });
 
-    const handleSubmit = () => {
+    const showResult = (result: SubmissionResult, enteredEmail: string) => {
+        if (result.status === "created") {
+            setCompletedRegistration({ outcome: "created", email: enteredEmail });
+        } else if (result.status === "already_registered") {
+            setCompletedRegistration({ outcome: "already_registered", email: enteredEmail });
+        } else if (result.status === "invalid") {
+            for (const [field, messages] of Object.entries(result.fieldErrors)) {
+                form.setError(field as keyof RegistrationFormValues, { message: messages?.[0] });
+            }
+        }
+        // TODO(deferred): submission-failed state. Until it is designed, an error returns to the
+        // form with every value kept and the button enabled again, with no message (brief 8.8).
+    };
+
+    const handleSubmit = async () => {
         setIsSending(true);
+        // The raw values go to the server, which validates them again with the same schema.
+        const values = form.getValues();
+        try {
+            showResult(await submitRegistration(values), values.email.trim());
+        } catch (error) {
+            // A network failure never reaches the server's log, so it is recorded here.
+            console.error("Early access submission did not reach the server", error);
+        } finally {
+            setIsSending(false);
+        }
     };
 
     const finish = () => {
