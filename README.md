@@ -57,10 +57,10 @@ Local Supabase Studio, for looking at the table, is at `http://127.0.0.1:54323` 
 
 | Variable | Used by | Notes |
 | --- | --- | --- |
-| `SUPABASE_URL` | Server only | The Supabase project URL. |
+| `SUPABASE_URL` | Server only | The bare project URL, `https://<project-ref>.supabase.co`, with no path, query or trailing slash (locally `http://127.0.0.1:54321`, the only `http` URL accepted). Do not paste the REST endpoint (`…/rest/v1`): supabase-js adds that itself, and a doubled path makes every insert fail with `PGRST125`. |
 | `SUPABASE_SECRET_KEY` | Server only | A secret key (`sb_secret_…`). It bypasses row level security, so it must never reach the browser. Legacy `service_role` keys are rejected. |
 
-Both are validated with Zod in `src/lib/env.ts` the first time the server needs them; an invalid deployment fails on its first submission with an error that names the variable but not its value. Nothing Supabase-related is prefixed `NEXT_PUBLIC_`.
+Both are validated with Zod in `src/lib/env.ts` the first time the server needs them; an invalid deployment fails on its first submission with an error that names the variable and what is expected, but never its value. Nothing Supabase-related is prefixed `NEXT_PUBLIC_`.
 
 ## Database and migrations
 
@@ -119,13 +119,15 @@ npm run lint               # must report zero warnings
 1. Apply the migrations to the production Supabase project (see [Remote](#remote-production)).
 2. In Vercel, import the GitHub repository `ideaworkbench/pakoda-website`. Vercel detects Next.js; keep the default build command (`npm run build`) and install command (`npm ci` via the lockfile).
 3. In **Project Settings → Environment Variables**, add both variables for **Production only** (not Preview, not Development):
-   - `SUPABASE_URL`: the project URL from the Supabase dashboard.
+   - `SUPABASE_URL`: exactly `https://ijmlwiwlaazpqbfgvdhp.supabase.co`, which is `https://<project-ref>.supabase.co` for the production project. No `/rest/v1`, no trailing slash.
    - `SUPABASE_SECRET_KEY`: from Supabase dashboard → **Settings → API Keys** → secret key (`sb_secret_…`).
 4. Deploy. Check the page, then submit one test registration and remove it in the Supabase dashboard.
 
 Functions, including the server action, run in **hnd1 (Tokyo)**, next to the Supabase project in ap-northeast-1, so each insert is a short round trip. This is set in `vercel.json` (`"regions": ["hnd1"]`) rather than in the dashboard, so it is versioned and reviewed with the code; a region set in the project settings is overridden by this file.
 
 **Preview deployments cannot submit registrations.** They have no Supabase variables, so the server action fails its environment check and every submission shows the generic error view. This keeps previews from writing to the production database. Revisit this only together with a decision on a separate Supabase project for previews.
+
+**A page left open across a deploy cannot submit.** Server Actions are tied to the build that served the page, so after a new deployment a tab opened before it gets "Failed to find Server Action" and shows the generic error view. Refreshing the page fixes it.
 
 ## Project structure
 
