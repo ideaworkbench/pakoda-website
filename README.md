@@ -125,7 +125,7 @@ npm run lint               # must report zero warnings
 
 Functions, including the server action, run in **hnd1 (Tokyo)**, next to the Supabase project in ap-northeast-1, so each insert is a short round trip. This is set in `vercel.json` (`"regions": ["hnd1"]`) rather than in the dashboard, so it is versioned and reviewed with the code; a region set in the project settings is overridden by this file.
 
-**Preview deployments cannot submit registrations.** They have no Supabase variables, so the server action fails its environment check and every submission fails. This keeps previews from writing to the production database. Revisit this only together with a decision on a separate Supabase project for previews.
+**Preview deployments cannot submit registrations.** They have no Supabase variables, so the server action fails its environment check and every submission shows the generic error view. This keeps previews from writing to the production database. Revisit this only together with a decision on a separate Supabase project for previews.
 
 ## Project structure
 
@@ -150,10 +150,21 @@ tests/                           unit, integration, e2e, visual references, base
 - At 1470px wide the page is Figma frame `1-96` exactly. Below 1470px the whole 1470 × 900 composition is scaled down in CSS only (`min(1, tan(atan2(100cqw, 1470px)))`). Above 1470px the block stays at design size, centred, with 1px guide lines (frame `1-119`).
 - The modal renders outside the scaled stage, so it is always drawn at Figma size. It closes only through x-close or "Done".
 
+## Submission outcomes
+
+| Outcome | What the user sees |
+| --- | --- |
+| Saved | "You’re on the list!" (Figma `7-6308`). Done or x-close resets the form. |
+| Email already registered, in any letter case | "You’re already on the list!" (`7-6743`). Not an error. |
+| Honeypot filled | The normal "on the list" view; nothing is stored. |
+| Field problems found by the server | Back to the form, with the messages inline under the fields. |
+| Any other failure: a database or server error, or a request that never completes (offline, network drop, server unreachable) | One generic error view, "Something went wrong" (`61-1198`), never with causes, codes or messages. Focus moves to its title. "Try again" returns to the form with every value as it was and focus on the submit button; nothing is resubmitted automatically. x-close keeps the values, because nothing was saved. |
+
+Server errors are logged with their error code and message only, never personal data. A request that never reaches the server is logged in the browser console.
+
 ## Deferred
 
 Out of scope for this release, not built:
 
-- **Tablet and mobile layouts.** Below about 1000px wide the scaled page makes small text very small.
-- **Submission-failed state** (design and copy). Interim behaviour: on any error the form returns to its default state with every value kept and the button enabled again; the server logs the error code and message; no message is shown. Marked `TODO(deferred)` in `src/components/early-access/early-access-provider.tsx`.
+- **Tablet and mobile layouts.** Below about 1000px wide the scaled page makes small text very small. Figma frames `58:1119` and `58:1076` are not built yet.
 - **Privacy Policy page and the link to it.** "Privacy Policy." is styled as in Figma but is plain text.

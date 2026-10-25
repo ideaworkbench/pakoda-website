@@ -29,6 +29,8 @@ export const EarlyAccessProvider = ({ children }: { children: ReactNode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [completedRegistration, setCompletedRegistration] = useState<CompletedRegistration | null>(null);
+    const [hasSubmissionFailed, setHasSubmissionFailed] = useState(false);
+    const [shouldFocusSubmit, setShouldFocusSubmit] = useState(false);
 
     const form = useForm<RegistrationFormValues, unknown, Registration>({
         resolver: zodResolver(registrationSchema),
@@ -43,16 +45,18 @@ export const EarlyAccessProvider = ({ children }: { children: ReactNode }) => {
         } else if (result.status === "already_registered") {
             setCompletedRegistration({ outcome: "already_registered", email: enteredEmail });
         } else if (result.status === "invalid") {
+            // Field problems stay inline under their fields, never in the error view.
             for (const [field, messages] of Object.entries(result.fieldErrors)) {
                 form.setError(field as keyof RegistrationFormValues, { message: messages?.[0] });
             }
+        } else {
+            setHasSubmissionFailed(true);
         }
-        // TODO(deferred): submission-failed state. Until it is designed, an error returns to the
-        // form with every value kept and the button enabled again, with no message (brief 8.8).
     };
 
     const handleSubmit = async () => {
         setIsSending(true);
+        setShouldFocusSubmit(false);
         // The raw values go to the server, which validates them again with the same schema.
         const values = form.getValues();
         try {
@@ -60,9 +64,23 @@ export const EarlyAccessProvider = ({ children }: { children: ReactNode }) => {
         } catch (error) {
             // A network failure never reaches the server's log, so it is recorded here.
             console.error("Early access submission did not reach the server", error);
+            setHasSubmissionFailed(true);
         } finally {
             setIsSending(false);
         }
+    };
+
+    // Back to the form exactly as it was left; nothing is resubmitted until the user presses the button.
+    const tryAgain = () => {
+        setHasSubmissionFailed(false);
+        setShouldFocusSubmit(true);
+    };
+
+    // From the form or the error view: nothing was saved, so every value is kept for reopening.
+    const close = () => {
+        setIsOpen(false);
+        setHasSubmissionFailed(false);
+        setShouldFocusSubmit(false);
     };
 
     const finish = () => {
@@ -79,8 +97,11 @@ export const EarlyAccessProvider = ({ children }: { children: ReactNode }) => {
                 form={form}
                 isSending={isSending}
                 completedRegistration={completedRegistration}
+                hasSubmissionFailed={hasSubmissionFailed}
+                shouldFocusSubmit={shouldFocusSubmit}
                 onSubmit={handleSubmit}
-                onClose={() => setIsOpen(false)}
+                onTryAgain={tryAgain}
+                onClose={close}
                 onFinish={finish}
             />
         </EarlyAccessContext.Provider>

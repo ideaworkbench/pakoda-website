@@ -17,6 +17,7 @@ Figma | build | diff images for card screens are in tests/visual/side-by-side/.
 | form-field-error | 7-6775 | 1.893% | 0.805% | 1.000% | none | pass |
 | form-loading | 11-9300 | 1.402% | 0.605% | 1.000% | 7: checkbox state impossible with these field values; Figma shows empty fields while sending | pass |
 | result-on-the-list | 7-6308 | 1.761% | 0.673% | 1.000% | none | pass |
+| result-error | 61-1198 | 1.927% | 0.754% | 1.000% | none | pass |
 | result-already-on-the-list | 7-6743 | 2.598% | 1.057% | 1.057% | none | pass (accepted exception) |
 
 ## Accepted exceptions

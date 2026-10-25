@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Controller, type UseFormReturn, useWatch } from "react-hook-form";
 import { LoadingSpinner } from "@/assets/icons/loading-spinner";
 import { Button } from "@/components/base/buttons/button";
@@ -15,6 +16,7 @@ import { TextInputField } from "./text-input-field";
 interface EarlyAccessFormProps {
     form: UseFormReturn<RegistrationFormValues, unknown, Registration>;
     isSending: boolean;
+    shouldFocusSubmit: boolean;
     onSubmit: (registration: Registration) => void;
 }
 
@@ -32,10 +34,16 @@ const consentLabel = (
     </>
 );
 
-export const EarlyAccessForm = ({ form, isSending, onSubmit }: EarlyAccessFormProps) => {
+export const EarlyAccessForm = ({ form, isSending, shouldFocusSubmit, onSubmit }: EarlyAccessFormProps) => {
     const { control, register, handleSubmit } = form;
     const values = useWatch({ control }) as RegistrationFormValues;
     const isReady = isReadyToSubmit(values);
+    const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+    // Back from the error view, the user's next step is to submit again.
+    useEffect(() => {
+        if (shouldFocusSubmit) submitButtonRef.current?.focus();
+    }, [shouldFocusSubmit]);
 
     return (
         <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
@@ -130,6 +138,7 @@ export const EarlyAccessForm = ({ form, isSending, onSubmit }: EarlyAccessFormPr
             {/* Figma draws the enabled button flat (no shadow, ring or inner border) in medium weight.
                 While sending it shows Figma's spinner and the hover blue instead of the disabled grey. */}
             <Button
+                ref={submitButtonRef}
                 type="submit"
                 color="primary"
                 size="sm"
