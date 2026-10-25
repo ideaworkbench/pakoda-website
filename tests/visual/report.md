@@ -8,7 +8,7 @@ Figma | build | diff images for card screens are in tests/visual/side-by-side/.
 | Screen | Figma node | Raw mismatch | Filtered mismatch | Limit | Masks | Result |
 | --- | --- | --- | --- | --- | --- | --- |
 | landing-1470 | 1-96 | 0.818% | 0.228% | 0.500% | none | pass |
-| landing-1728 | 1-119 | 0.560% | 0.156% | 0.500% | none | pass |
+| landing-1728 | 1-119 | 0.561% | 0.156% | 0.500% | none | pass |
 | landing-overlay-form | 30-25159 | 0.911% | 0.299% | 0.500% | none | pass |
 | form-default | 7-196 | 1.877% | 0.807% | 1.000% | 2: checkbox state impossible with these field values; button state impossible with these field values | pass |
 | form-mobile-number | 27-24951 | 2.044% | 0.915% | 1.000% | 2: checkbox state impossible with these field values; button state impossible with these field values | pass |
