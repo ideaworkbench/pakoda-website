@@ -48,7 +48,9 @@ export const SelectItem = ({ label, id, value, avatarUrl, supportingText, isDisa
                         "flex cursor-pointer items-center gap-2 rounded-md outline-hidden select-none",
                         state.isSelected && "bg-active",
                         state.isDisabled && "cursor-not-allowed",
-                        state.isFocused && "bg-primary_hover",
+                        // Selected keeps Figma's bg-active under the pointer or focus; keyboard focus
+                        // still shows through the inset focus ring below.
+                        state.isFocused && !state.isSelected && "bg-primary_hover",
                         state.isFocusVisible && "ring-2 ring-focus-ring ring-inset",
 
                         // Icon styles

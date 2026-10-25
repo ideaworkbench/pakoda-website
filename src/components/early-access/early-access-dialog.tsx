@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { UseFormReturn } from "react-hook-form";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
 import type { Registration, RegistrationFormValues } from "@/lib/early-access/schema";
+import { cx } from "@/utils/cx";
 import { CloseButton } from "./close-button";
 import { EarlyAccessForm } from "./early-access-form";
 import { type RegistrationOutcome, RegistrationResult } from "./registration-result";
@@ -46,9 +47,20 @@ export const EarlyAccessDialog = ({ isOpen, form, isSending, completedRegistrati
             isKeyboardDismissDisabled
             data-testid="modal-overlay"
             // Figma: bg-primary-solid (#0A0D12) at 50% opacity with no blur, card centred both ways.
-            className="items-center justify-center bg-[rgba(10,13,18,0.5)] p-0 backdrop-blur-none sm:p-0"
+            className={cx(
+                "justify-center bg-[rgba(10,13,18,0.5)] p-0 backdrop-blur-none sm:p-0",
+                completedRegistration ? "items-center sm:items-center" : "items-start sm:items-start",
+            )}
         >
-            <Modal className="w-auto max-sm:overflow-visible max-sm:rounded-none">
+            <Modal
+                className={cx(
+                    "w-auto max-sm:overflow-visible max-sm:rounded-none",
+                    // The form view keeps the top edge its default 518px height (Figma 7-196) gets when
+                    // centred, so error messages grow it downward instead of moving x-close mid-click.
+                    // Result views stay centred.
+                    !completedRegistration && "mt-[max(0px,calc((100dvh-518px)/2))]",
+                )}
+            >
                 <Dialog aria-label="Pakoda early access">
                     {/* Figma's 1px card border is drawn inside the 400px width, hence an inset ring. */}
                     <div data-testid="early-access-card" className="relative w-[400px] rounded-2xl bg-primary p-8 ring-1 ring-primary ring-inset">

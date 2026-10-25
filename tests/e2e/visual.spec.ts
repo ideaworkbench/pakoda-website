@@ -2,10 +2,10 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { type Page, expect, test } from "@playwright/test";
 import {
-  MAXIMUM_FILTERED_MISMATCH_PERCENT,
   compareWithFigma,
   screenshotDirectory,
   visualScreens,
+  writeSideBySide,
 } from "../../scripts/compare-with-figma";
 import { deleteRegistrationsWithEmail } from "../support/local-supabase";
 import {
@@ -168,7 +168,8 @@ for (const screen of visualScreens) {
       writeFileSync(path.join(screenshotDirectory, `${screen.name}.png`), screenshot);
 
       const result = compareWithFigma(screen, screenshot);
-      expect(result.filteredMismatchPercent, `filtered mismatch for ${screen.name}`).toBeLessThanOrEqual(MAXIMUM_FILTERED_MISMATCH_PERCENT);
+      if (screen.isCardFrame) writeSideBySide(screen, screenshot, result.diffImage);
+      expect(result.filteredMismatchPercent, `filtered mismatch for ${screen.name}`).toBeLessThanOrEqual(result.maximumFilteredMismatchPercent);
       expect(screenshot).toMatchSnapshot(`${screen.name}.png`);
     });
   });

@@ -169,3 +169,15 @@ test("13. the order channels list works with the keyboard", async ({ page }) => 
 
   await expect(trigger).not.toContainText(fieldNames.orderChannels);
 });
+
+test("13. a selected item keeps its selected background, and keyboard focus on it shows the focus ring", async ({ page }) => {
+  const trigger = selectTrigger(page, fieldNames.orderChannels);
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Space");
+
+  const selectedAndFocused = page.getByRole("option", { selected: true }).locator("div").first();
+  await expect(selectedAndFocused).toHaveCSS("background-color", "rgb(245, 245, 245)");
+  await expect(selectedAndFocused).toHaveCSS("box-shadow", /rgb\(26, 61, 170\)/);
+});

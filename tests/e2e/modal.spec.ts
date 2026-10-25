@@ -52,8 +52,6 @@ test("4. closing mid-entry and reopening keeps the entered values", async ({ pag
   await openFromHeader(page);
   await textField(page, fieldNames.fullName).fill("Asha Rao");
   await textField(page, fieldNames.email).fill("asha@");
-  // Leave the field first: its error grows the centred card, which moves x-close mid-click.
-  await textField(page, fieldNames.email).blur();
 
   await closeButton(page).click();
   await expect(dialog(page)).toBeHidden();
@@ -61,4 +59,20 @@ test("4. closing mid-entry and reopening keeps the entered values", async ({ pag
 
   await expect(textField(page, fieldNames.fullName)).toHaveValue("Asha Rao");
   await expect(textField(page, fieldNames.email)).toHaveValue("asha@");
+});
+
+test("the form card keeps its top edge when an error grows it, so x-close works on the first click", async ({ page }) => {
+  await openFromHeader(page);
+  const card = page.getByTestId("early-access-card");
+  await page.evaluate(() => Promise.all(document.getAnimations().map((animation) => animation.finished)));
+  expect((await card.boundingBox())?.y).toBe(191);
+
+  await textField(page, fieldNames.email).fill("asha@");
+  await textField(page, fieldNames.mobileNumber).click();
+  await expect(dialog(page).getByText("Enter a valid email address.")).toBeVisible();
+  expect((await card.boundingBox())?.y).toBe(191);
+
+  await textField(page, fieldNames.email).click();
+  await closeButton(page).click();
+  await expect(dialog(page)).toBeHidden();
 });
