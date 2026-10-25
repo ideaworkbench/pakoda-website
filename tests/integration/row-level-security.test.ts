@@ -16,7 +16,7 @@ afterAll(async () => {
   await deleteRegistrationsWithEmail(testEmail);
 });
 
-describe("row level security on early_access_registrations", () => {
+describe("access control on early_access_registrations", () => {
   it("does not let the publishable key insert", async () => {
     const { error } = await publishableClient().from("early_access_registrations").insert(row);
 
@@ -31,5 +31,12 @@ describe("row level security on early_access_registrations", () => {
     const { data } = await publishableClient().from("early_access_registrations").select("*");
 
     expect(data ?? []).toEqual([]);
+  });
+
+  it("gives the publishable key no table privileges at all, not just an empty RLS result", async () => {
+    const { error } = await publishableClient().from("early_access_registrations").select("id");
+
+    expect(error?.code).toBe("42501");
+    expect(error?.message).toMatch(/permission denied for table early_access_registrations/);
   });
 });

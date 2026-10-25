@@ -68,7 +68,7 @@ The schema lives in `supabase/migrations/`. One table, `public.early_access_regi
 
 - check constraints that mirror the form rules (a unit test checks the form's option lists against them),
 - a unique index on `lower(email)`, so duplicates are detected regardless of letter case,
-- row level security on with no policies: the publishable key can neither read nor write; only the server's secret key can.
+- row level security on with no policies, and all table privileges revoked from `anon` and `authenticated` as a second barrier: the publishable key can neither read nor write; only the server's secret key can.
 
 ### Local
 
