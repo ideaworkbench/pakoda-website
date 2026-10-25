@@ -10,7 +10,7 @@ const validInput = {
   businessType: "grocery",
   mobileNumber: "9876543210",
   email: testEmail,
-  orderChannels: ["walk_in", "delivery_apps", "walk_in"],
+  orderChannels: ["delivery_apps", "walk_in", "delivery_apps"],
   consentGiven: true,
   website: "",
 };

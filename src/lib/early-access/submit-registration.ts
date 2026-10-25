@@ -4,7 +4,7 @@ import "server-only";
 import { z } from "zod";
 import { createServerSupabaseClient } from "@/lib/supabase/server-client";
 import { toStoredMobileNumber } from "./mobile-number";
-import { type RegistrationFormValues, registrationSchema } from "./schema";
+import { type RegistrationFormValues, orderChannelOptions, registrationSchema } from "./schema";
 import { type SubmissionResult, submissionResultFromInsert } from "./submission-result";
 
 /**
@@ -38,7 +38,8 @@ export async function submitRegistration(input: RegistrationFormValues): Promise
             business_type: registration.businessType,
             mobile_number: toStoredMobileNumber(registration.mobileNumber),
             email: registration.email,
-            order_channels: [...new Set(registration.orderChannels)],
+            // De-duplicated and in the fixed option order, the same order the field shows them in.
+            order_channels: orderChannelOptions.map((option) => option.value).filter((value) => registration.orderChannels.includes(value)),
             consent_given: true,
             consent_given_at: new Date().toISOString(),
         });

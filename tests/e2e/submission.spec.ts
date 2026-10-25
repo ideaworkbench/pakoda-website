@@ -72,7 +72,7 @@ test("12 and 13. the mobile number and order channels are stored", async ({ page
   expect(row.order_channels).toEqual(["walk_in", "delivery_apps"]);
 });
 
-test("16. the same email in any case shows the already-registered view with only the email bold", async ({ page }) => {
+test("16. the same email in any case shows the already-registered view with only the entered email bold", async ({ page }) => {
   await fillRequiredFields(page, testEmail);
   await submitButton(page).click();
   await dialog(page).getByRole("button", { name: "Done" }).click();
@@ -84,7 +84,8 @@ test("16. the same email in any case shows the already-registered view with only
   await expect(dialog(page).getByText("You’re already on the list!")).toBeVisible();
   const boldText = dialog(page).locator("strong");
   await expect(boldText).toHaveCount(1);
-  await expect(boldText).toHaveText(testEmail);
+  // The view shows the email as the user entered it (brief 8.8).
+  await expect(boldText).toHaveText(testEmail.toUpperCase());
   expect(await registrationsWithEmail(testEmail)).toHaveLength(1);
 });
 
