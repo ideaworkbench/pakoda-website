@@ -118,12 +118,12 @@ npm run lint               # must report zero warnings
 
 1. Apply the migrations to the production Supabase project (see [Remote](#remote-production)).
 2. In Vercel, import the GitHub repository `ideaworkbench/pakoda-website`. Vercel detects Next.js; keep the default build command (`npm run build`) and install command (`npm ci` via the lockfile).
-3. In **Project Settings → Environment Variables**, add both variables for **Production** and **Preview**:
+3. In **Project Settings → Environment Variables**, add both variables for **Production only** (not Preview, not Development):
    - `SUPABASE_URL`: the project URL from the Supabase dashboard.
    - `SUPABASE_SECRET_KEY`: from Supabase dashboard → **Settings → API Keys** → secret key (`sb_secret_…`).
 4. Deploy. Check the page, then submit one test registration and remove it in the Supabase dashboard.
 
-Preview deployments use the same variables, so **they write to the same production Supabase project**. Delete any test rows made from a preview.
+**Preview deployments cannot submit registrations.** They have no Supabase variables, so the server action fails its environment check and every submission fails. This keeps previews from writing to the production database. Revisit this only together with a decision on a separate Supabase project for previews.
 
 ## Project structure
 
