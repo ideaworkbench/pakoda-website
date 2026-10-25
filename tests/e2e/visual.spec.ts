@@ -7,7 +7,7 @@ import {
   visualScreens,
   writeSideBySide,
 } from "../../scripts/compare-with-figma";
-import { deleteRegistrationsWithEmail } from "../support/local-supabase";
+import { allowServerInserts, blockServerInserts, deleteRegistrationsWithEmail } from "../support/local-supabase";
 import {
   dialog,
   fieldNames,
@@ -137,6 +137,20 @@ const captures: Record<string, { viewport: { width: number; height: number }; ca
       await submitAs(page, figmaEmail);
       await expect(dialog(page).getByText("You’re on the list!")).toBeVisible();
       return cardScreenshot(page);
+    },
+  },
+  "result-error": {
+    viewport: { width: 1470, height: 900 },
+    capture: async (page) => {
+      // A real database error: the server's insert privilege is revoked for this capture only.
+      blockServerInserts();
+      try {
+        await submitAs(page, figmaEmail);
+        await expect(dialog(page).getByText("Something went wrong")).toBeVisible();
+        return await cardScreenshot(page);
+      } finally {
+        allowServerInserts();
+      }
     },
   },
   "result-already-on-the-list": {

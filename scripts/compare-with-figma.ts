@@ -92,6 +92,7 @@ export const visualScreens: VisualScreen[] = [
   { name: "form-field-error", figmaNode: "7-6775", isCardFrame: true, masks: [] },
   { name: "form-loading", figmaNode: "11-9300", isCardFrame: true, masks: [checkboxBox, ...loadingFieldText] },
   { name: "result-on-the-list", figmaNode: "7-6308", isCardFrame: true, masks: [] },
+  { name: "result-error", figmaNode: "61-1198", isCardFrame: true, masks: [] },
   {
     name: "result-already-on-the-list",
     figmaNode: "7-6743",

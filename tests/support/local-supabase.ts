@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 
 const tableName = "early_access_registrations";
@@ -33,4 +34,21 @@ export async function registrationsWithEmail(email: string) {
 export async function deleteRegistrationsWithEmail(email: string) {
   const { error } = await adminClient().from(tableName).delete().ilike("email", email);
   if (error) throw new Error(`Deleting registrations failed: ${error.message}`);
+}
+
+// Runs SQL as the postgres superuser in the local Supabase database container, which the CLI
+// names after config.toml's project_id. Used only to cause real database errors in tests.
+function runLocalSql(sql: string) {
+  const projectId = readFileSync("supabase/config.toml", "utf8").match(/^project_id = "([^"]+)"/m)?.[1];
+  execFileSync("docker", ["exec", `supabase_db_${projectId}`, "psql", "-U", "postgres", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-c", sql], {
+    stdio: "ignore",
+  });
+}
+
+export function blockServerInserts() {
+  runLocalSql("revoke insert on table public.early_access_registrations from service_role;");
+}
+
+export function allowServerInserts() {
+  runLocalSql("grant insert on table public.early_access_registrations to service_role;");
 }
