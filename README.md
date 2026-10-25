@@ -123,6 +123,8 @@ npm run lint               # must report zero warnings
    - `SUPABASE_SECRET_KEY`: from Supabase dashboard → **Settings → API Keys** → secret key (`sb_secret_…`).
 4. Deploy. Check the page, then submit one test registration and remove it in the Supabase dashboard.
 
+Functions, including the server action, run in **hnd1 (Tokyo)**, next to the Supabase project in ap-northeast-1, so each insert is a short round trip. This is set in `vercel.json` (`"regions": ["hnd1"]`) rather than in the dashboard, so it is versioned and reviewed with the code; a region set in the project settings is overridden by this file.
+
 **Preview deployments cannot submit registrations.** They have no Supabase variables, so the server action fails its environment check and every submission fails. This keeps previews from writing to the production database. Revisit this only together with a decision on a separate Supabase project for previews.
 
 ## Project structure
